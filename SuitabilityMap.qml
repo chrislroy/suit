@@ -142,8 +142,8 @@ Window {
                 Layout.bottomMargin: 5
                 Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
                 Layout.fillWidth: true
-                Gradient {
-
+                gradient : Gradient {
+                    orientation: Gradient.Horizontal
                     GradientStop { position: 0.0; color: "#640000ff" }
                     GradientStop { position: 0.25; color: "#8000ff00" }
                     GradientStop { position: 0.5; color: "#a5ffff00" }
@@ -192,6 +192,7 @@ Window {
         Rectangle {
             id: rectangle
             color: "#cb3434"
+
             gradient: Gradient {
                 GradientStop {
                     position: 0
@@ -203,9 +204,10 @@ Window {
                     color: "#000000"
                 }
             }
+
             anchors.fill: parent
         }
-
+/*
         gradient: Gradient {
             GradientStop {
                 position: 0
@@ -217,7 +219,7 @@ Window {
                 color: "#000000"
             }
         }
-
+*/
     }
 
     Rectangle {
@@ -392,6 +394,16 @@ Window {
 */
 
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
