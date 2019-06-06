@@ -24,78 +24,71 @@ Window {
         return s.replace("0x", "#");
     }
 
-    Row {
-        id: activateMaps
+    Rectangle {
+        id: activeMapsBackground
+        color: "white"
         height: 40
-        /*
-        anchors.right: parent.right
-        anchors.rightMargin: 0
-        anchors.left: parent.left
-        anchors.leftMargin: 0
-        */
         anchors {
             top: parent.top
+            left: parent.left
+            right: parent.right
         }
 
-        Rectangle {
-            id: activeMapsBackground
-            color: "white"
-            anchors.fill: parent
+        RowLayout {
+            id: activateMaps
+            height: 40
+
+            anchors.fill:parent
+
             Text {
                 id: activeMapsLabel
                 height: 23
                 color: "#797979"
                 text: "Activate Maps"
-                anchors.verticalCenterOffset: 9
-                anchors.right: parent.right
-                anchors.rightMargin: -197
-                anchors.left: parent.left
-                anchors.leftMargin: 16
+                Layout.leftMargin: 15
                 font.bold: true
                 font.pointSize: 19
                 font.wordSpacing: -0.1
-                anchors.verticalCenter: parent.verticalCenter
-                Layout.fillWidth: true
             }
             Switch {
                 id: activeMapsSwitch
-                anchors.verticalCenterOffset: 0
-                anchors.left: activeMapsLabel.right
-                anchors.leftMargin: 337
-                anchors.verticalCenter: parent.verticalCenter
+                Layout.rightMargin: 15
+                Layout.leftMargin: 1
+                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+
                 onClicked: console.log("Switch clicked:" + checked)
             }
         }
-
     }
 
-    Row {
-        id: mapsSelector
-        width: 640
+    Rectangle {
+        id: selectorBackground
+        color: "#2e2e2e"
         height: 80
-        anchors.top: activateMaps.bottom
-        anchors.topMargin: 0
-        /*
-        anchors.right: parent.right
-        anchors.rightMargin: 0
-        anchors.left: parent.left
-        anchors.leftMargin: 0
-        */
-        Rectangle {
-            id: selectorBackground
-            color: "#2e2e2e"
-            anchors.fill: parent
+        anchors {
+            top: activeMapsBackground.bottom
+            left: parent.left
+            right: parent.right
+        }
+
+        RowLayout {
+            id: mapsSelector
+
+            anchors.fill:parent
+
 
             Image {
                 id: mapThumbnail
                 y: 40
                 width: 70
                 height: 70
-                anchors.left: parent.left
-                anchors.leftMargin: 15
-                anchors.verticalCenter: parent.verticalCenter
-
-                source: toQrc(thumbnail)
+                Layout.preferredWidth: 80
+                Layout.bottomMargin: 5
+                Layout.topMargin: 5
+                Layout.fillHeight: true
+                Layout.fillWidth: false
+                source: "map-thumbnail.png"
+                Layout.leftMargin: 15
                 fillMode: Image.PreserveAspectFit
             }
 
@@ -103,9 +96,8 @@ Window {
                 id: mapSelector
                 x: -240
                 y: 20
-                anchors.right: mapEdit.left
-                anchors.rightMargin: 100
-                anchors.verticalCenter: parent.verticalCenter
+                Layout.leftMargin: 50
+                Layout.fillWidth: true
             }
 
             Button {
@@ -114,47 +106,42 @@ Window {
                 y: 12
                 width: 20
                 height: 20
-                anchors.right: parent.right
-                anchors.rightMargin: 15
-                anchors.verticalCenter: parent.verticalCenter
+                Layout.rightMargin: 15
+                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
             }
 
         }
     }
-
-    Row {
-        id: costGradient
-        y: 0
-        width: 640
-        height: 80
-        anchors.top: mapsSelector.bottom
+    Rectangle {
+        id: costGradiantBackground
+        color: "white"
         anchors.topMargin: 0
-
-
-        Rectangle {
-            id: costGradiantBackground
-            color: "white"
+        height: 80
+        anchors {
+            top: selectorBackground.bottom
+            left: parent.left
+            right: parent.right
+        }
+        RowLayout {
+            id: costGradient
+            anchors.fill:parent
 
             Text {
                 id: costGradientLabel
                 color: "#797979"
                 text: "Cost Gradient"
-                anchors.left: parent.left
-                anchors.leftMargin: 15
+                Layout.topMargin: 5
+                Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+                Layout.leftMargin: 15
                 font.bold: true
                 font.pointSize: 19
-                anchors.top: parent.top
-                anchors.topMargin: 11
             }
 
             Rectangle {
                 id: gradientRectangle
-                anchors.top: costGradientLabel.bottom
-                anchors.topMargin: 5
-                anchors.left : parent.left
-                anchors.leftMargin: 15
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 11
+                Layout.bottomMargin: 5
+                Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
+                Layout.fillWidth: true
                 Gradient {
 
                     GradientStop { position: 0.0; color: "#640000ff" }
@@ -164,40 +151,61 @@ Window {
                     GradientStop { position: 1.0; color: "#f0ff0000" }
                 }
             }
-
-
-        }
-    }
-
-    Row {
-        id: layers
-        y: 0
-        width: 640
-        height: 40
-        anchors.top: costGradient.bottom
-        anchors.topMargin: 0
-
-
-        Rectangle {
-            id: rectangle1
-            anchors.fill: parent
-            color: "#2e2e2e"
-            Text {
-                text: "Layers"
-                font.bold: true
-                font.pointSize: 19
-                anchors.left: parent.left
-                anchors.leftMargin: 15
-                anchors.verticalCenter: parent.verticalCenter
-                color: "#797979"
-            }
         }
     }
 
     Rectangle {
+        id: layersLabelBackground
+        color: "#2e2e2e"
+        anchors.top: costGradiantBackground.bottom
+        anchors.topMargin: 0
+        height: 40
+        anchors {
+            left: parent.left
+            right: parent.right
+        }
+
+        RowLayout {
+            id: layers
+            anchors.fill:parent
+
+            Text {
+                text: "Layers"
+                Layout.leftMargin: 15
+                font.bold: true
+                font.pointSize: 19
+                color: "#797979"
+            }
+        }
+    }
+    Rectangle {
         id: junk
+        height: 200
         color: "#cb5d5d"
-        anchors.bottomMargin: 0
+        anchors.topMargin: 0
+        anchors {
+            top: layersLabelBackground.bottom
+            right: parent.right
+            left: parent.left
+        }
+
+        Rectangle {
+            id: rectangle
+            color: "#cb3434"
+            gradient: Gradient {
+                GradientStop {
+                    position: 0
+                    color: "#cb3434"
+                }
+
+                GradientStop {
+                    position: 1
+                    color: "#000000"
+                }
+            }
+            anchors.fill: parent
+        }
+
         gradient: Gradient {
             GradientStop {
                 position: 0
@@ -209,37 +217,47 @@ Window {
                 color: "#000000"
             }
         }
-        anchors {
-            top: layers.bottom
-            right: parent.right
-            left: parent.left
-            bottom: controls.top
-        }
+
     }
 
-    Row {
-        id: controls
-
+    Rectangle {
+        id: controlBackground
+        width: 40
+        anchors.top: junk.bottom
         anchors {
-            top: junk.bottom
+            right: parent.right
+            left: parent.left
             bottom: parent.bottom
         }
 
-        Button {
-            id: applyButton
-            text: "Apply"
-            anchors.left: parent.left
-            anchors.leftMargin: 15
-        }
+        RowLayout {
+            id: controls
+            anchors.rightMargin: 0
+            anchors.leftMargin: 0
+            anchors.bottomMargin: 0
+            anchors.topMargin: 0
+            anchors.fill:parent
 
-        Button {
-            id: addlayerButton
-            text: "Add Layer"
-            anchors.right: controlBackground.right
-            anchors.rightMargin: 15
-        }
+            Button {
+                id: applyButton
+                text: "Apply"
+                Layout.bottomMargin: 0
+                Layout.topMargin: 0
+                Layout.leftMargin: 15
+            }
 
+            Button {
+                id: addlayerButton
+                width: 0
+                text: "Add Layer"
+                Layout.rightMargin: 15
+                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+            }
+
+        }
     }
+
+
 
     /*
 
@@ -403,7 +421,33 @@ Window {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*##^## Designer {
-    D{i:1;anchors_height:200;anchors_width:200;anchors_x:227;anchors_y:210}D{i:6;anchors_height:200;anchors_width:200}
+    D{i:24;anchors_height:200;anchors_width:200}
 }
  ##^##*/

@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>SuitabilityMap.qml</file>
         <file>main.qml</file>
+        <file>map-thumbnail.png</file>
     </qresource>
 </RCC>
