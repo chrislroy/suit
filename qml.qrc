@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>SuitabilityMap.qml</file>
+        <file>main.qml</file>
+    </qresource>
+</RCC>
