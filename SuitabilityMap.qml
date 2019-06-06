@@ -27,46 +27,63 @@ Window {
     Row {
         id: activateMaps
         height: 40
+        /*
         anchors.right: parent.right
         anchors.rightMargin: 0
         anchors.left: parent.left
         anchors.leftMargin: 0
+        */
         anchors {
             top: parent.top
         }
 
-        Text {
-            text: "Activate Maps"
-            anchors.left: parent.left
-            anchors.leftMargin: 15
-            font.family: "Times New Roman"
-            font.bold: false
-            font.pointSize: 19
-            font.wordSpacing: -0.1
-            anchors.verticalCenter: parent.verticalCenter
-            Layout.fillWidth: true
-        }
-        Switch {
-            anchors.right: parent.right
-            anchors.rightMargin: 15
-            onClicked: console.log("Switch clicked:" + checked)
+        Rectangle {
+            id: activeMapsBackground
+            color: "white"
+            anchors.fill: parent
+            Text {
+                id: activeMapsLabel
+                height: 23
+                color: "#797979"
+                text: "Activate Maps"
+                anchors.verticalCenterOffset: 9
+                anchors.right: parent.right
+                anchors.rightMargin: -197
+                anchors.left: parent.left
+                anchors.leftMargin: 16
+                font.bold: true
+                font.pointSize: 19
+                font.wordSpacing: -0.1
+                anchors.verticalCenter: parent.verticalCenter
+                Layout.fillWidth: true
+            }
+            Switch {
+                id: activeMapsSwitch
+                anchors.verticalCenterOffset: 0
+                anchors.left: activeMapsLabel.right
+                anchors.leftMargin: 337
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: console.log("Switch clicked:" + checked)
+            }
         }
 
     }
 
     Row {
         id: mapsSelector
+        width: 640
         height: 80
         anchors.top: activateMaps.bottom
         anchors.topMargin: 0
+        /*
         anchors.right: parent.right
         anchors.rightMargin: 0
         anchors.left: parent.left
         anchors.leftMargin: 0
-
+        */
         Rectangle {
             id: selectorBackground
-            color: "#21211e"
+            color: "#2e2e2e"
             anchors.fill: parent
 
             Image {
@@ -107,20 +124,20 @@ Window {
 
     Row {
         id: costGradient
+        y: 0
+        width: 640
         height: 80
         anchors.top: mapsSelector.bottom
         anchors.topMargin: 0
-        anchors.right: parent.right
-        anchors.rightMargin: 0
-        anchors.left: parent.left
-        anchors.leftMargin: 0
+
+
         Rectangle {
             id: costGradiantBackground
             color: "white"
 
             Text {
                 id: costGradientLabel
-                color: "#21211e"
+                color: "#797979"
                 text: "Cost Gradient"
                 anchors.left: parent.left
                 anchors.leftMargin: 15
@@ -154,18 +171,17 @@ Window {
 
     Row {
         id: layers
+        y: 0
+        width: 640
         height: 40
         anchors.top: costGradient.bottom
         anchors.topMargin: 0
-        anchors.right: parent.right
-        anchors.rightMargin: 0
-        anchors.left: parent.left
-        anchors.leftMargin: 0
+
 
         Rectangle {
             id: rectangle1
             anchors.fill: parent
-            color: "#21211e"
+            color: "#2e2e2e"
             Text {
                 text: "Layers"
                 font.bold: true
@@ -173,14 +189,73 @@ Window {
                 anchors.left: parent.left
                 anchors.leftMargin: 15
                 anchors.verticalCenter: parent.verticalCenter
-                color: "white"
+                color: "#797979"
             }
         }
     }
 
+    Rectangle {
+        id: junk
+        color: "#cb5d5d"
+        anchors.bottomMargin: 0
+        gradient: Gradient {
+            GradientStop {
+                position: 0
+                color: "#cb5d5d"
+            }
+
+            GradientStop {
+                position: 1
+                color: "#000000"
+            }
+        }
+        anchors {
+            top: layers.bottom
+            right: parent.right
+            left: parent.left
+            bottom: controls.top
+        }
+    }
+
+    Row {
+        id: controls
+
+        anchors {
+            top: junk.bottom
+            bottom: parent.bottom
+        }
+
+        Button {
+            id: applyButton
+            text: "Apply"
+            anchors.left: parent.left
+            anchors.leftMargin: 15
+        }
+
+        Button {
+            id: addlayerButton
+            text: "Add Layer"
+            anchors.right: controlBackground.right
+            anchors.rightMargin: 15
+        }
+
+    }
+
+    /*
+
+
+
     ListModel {
         id: layerModel
     }
+
+    Component {
+        id: layerDelegate
+        Rectangle {
+
+        }
+    }
+
 
     Component {
         id: layerDelegate
@@ -283,7 +358,6 @@ Window {
 
     }
 
-
     ListView {
         id: layerList
         model: layerModel
@@ -297,6 +371,8 @@ Window {
         }
 
     }
+*/
+
 }
 
 
@@ -311,8 +387,23 @@ Window {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*##^## Designer {
-    D{i:1;anchors_height:200;anchors_width:200;anchors_x:227;anchors_y:210}D{i:6;anchors_x:-240}
-D{i:7;anchors_x:-240}D{i:5;anchors_height:200;anchors_width:200}
+    D{i:1;anchors_height:200;anchors_width:200;anchors_x:227;anchors_y:210}D{i:6;anchors_height:200;anchors_width:200}
 }
  ##^##*/
