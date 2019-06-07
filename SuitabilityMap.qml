@@ -11,9 +11,9 @@ Window {
     height: 480
     title: qsTr("Hello World")
 
-    property string suitabilityMap: ""
-    property int currentMap: -1
-    property string thumbnail: ""
+    property string maps;
+    property string currentMap: ""
+    property string currentMapIndex: ""
 
     Connections {
         target: applicationData
@@ -26,7 +26,9 @@ Window {
     function onMapChanged(map) {
         console.log(map);
 
-        suitabilityMap = map;
+        maps = map;
+
+        updateUi()
     }
 
     // functions
@@ -36,6 +38,73 @@ Window {
 
     function toColor(s) {
         return s.replace("0x", "#");
+    }
+
+    function isArray (value) {
+        return value && typeof value === 'object' && value.constructor === Array;
+    }
+
+    function updateUi() {
+
+        console.log("updateUi: Current map " + maps)
+        layerModel.clear();
+        mapModel.clear()
+        if (maps === "") {
+            return;
+        }
+
+        var mapsJson = JSON.parse(maps);
+
+        var currentIndex = ""
+        for(var j in mapsJson) {
+            if (mapsJson[j]["SuitabilityMap"]["Enabled"] && currentIndex === "") {
+                currentIndex = j;
+            }
+            mapModel.append( { mapName : mapsJson[j]["SuitabilityMap"]["Name"] })
+        }
+        mapModel.append( { mapName : "Create new map..." })
+
+        currentMapIndex = currentIndex;
+
+        // update the layer model
+        if (currentMapIndex !== "") {
+            mapThumbnail.source = toQrc(mapsJson[currentMapIndex]["SuitabilityMap"]["Thumbnail"]);
+            /*
+            var layers = theMap[currentMapIndex]["SuitabilityMap"]["SoftCostLayers"];
+            for (var i in layers) {
+                console.log("adding layer " + layers[i]["DisplayName"])
+                layerList.addLayer(layers[i]);
+            }
+            */
+            mapSelector.currentIndex = parseInt(currentMapIndex, 10);;
+        }
+    }
+
+    // disable suitability map or enable current map
+    function updateCurrentMap(checked) {
+
+        console.log("update all maps " + checked)
+
+        mapSelector.enabled = checked
+        if (!checked) {
+            layerModel.clear();
+            applicationData.onSuitabilityMapChange("");
+            return;
+        }
+
+        mapSelector.currentIndex = parseInt(currentMapIndex, 10);;
+        var mapsJson = JSON.parse(maps);
+
+        applicationData.onSuitabilityMapChange(mapsJson[currentMapIndex]["File"]);
+    }
+
+    // combo box model
+    ListModel {
+        id: mapModel
+    }
+
+    ListModel {
+        id: layerModel
     }
 
     Rectangle {
@@ -69,8 +138,8 @@ Window {
                 Layout.rightMargin: 15
                 Layout.leftMargin: 1
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-
-                onClicked: console.log("Switch clicked:" + checked)
+                checked: true
+                onClicked: updateCurrentMap(activeMapsSwitch.checked)
             }
         }
     }
@@ -101,7 +170,6 @@ Window {
                 Layout.topMargin: 5
                 Layout.fillHeight: true
                 Layout.fillWidth: false
-                source: "map-thumbnail.png"
                 Layout.leftMargin: 15
                 fillMode: Image.PreserveAspectFit
             }
@@ -110,6 +178,7 @@ Window {
                 id: mapSelector
                 x: -240
                 y: 20
+                model: mapModel
                 Layout.leftMargin: 50
                 Layout.fillWidth: true
             }
@@ -192,55 +261,39 @@ Window {
             }
         }
     }
+
     Rectangle {
-        id: junk
-        height: 200
-        color: "#cb5d5d"
-        anchors.topMargin: 0
+        color: "red"
         anchors {
             top: layersLabelBackground.bottom
-            right: parent.right
             left: parent.left
+            right: parent.right
+            bottom: controlBackground.top
         }
-
-        Rectangle {
-            id: rectangle
-            color: "#cb3434"
-
-            gradient: Gradient {
-                GradientStop {
-                    position: 0
-                    color: "#cb3434"
-                }
-
-                GradientStop {
-                    position: 1
-                    color: "#000000"
-                }
-            }
-
-            anchors.fill: parent
-        }
-/*
-        gradient: Gradient {
-            GradientStop {
-                position: 0
-                color: "#cb5d5d"
-            }
-
-            GradientStop {
-                position: 1
-                color: "#000000"
-            }
-        }
-*/
     }
+/*
+
+
+    ListView {
+        id: layerList
+        model: layerModel
+        delegate: layerDelegate
+
+        anchors {
+            top: layersLabelBackground.bottom
+            left: parent.left
+            right: parent.right
+            bottom: controlBackground.top
+        }
+
+    }
+
 
     Rectangle {
         id: controlBackground
         width: 40
-        anchors.top: junk.bottom
         anchors {
+            top: layerList.bottom
             right: parent.right
             left: parent.left
             bottom: parent.bottom
@@ -260,6 +313,7 @@ Window {
                 Layout.bottomMargin: 0
                 Layout.topMargin: 0
                 Layout.leftMargin: 15
+                onClicked: console.log("Apply")
             }
 
             Button {
@@ -268,27 +322,12 @@ Window {
                 text: "Add Layer"
                 Layout.rightMargin: 15
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                onClicked: console.log("Add Layer")
             }
 
         }
     }
 
-
-
-    /*
-
-
-
-    ListModel {
-        id: layerModel
-    }
-
-    Component {
-        id: layerDelegate
-        Rectangle {
-
-        }
-    }
 
 
     Component {
@@ -392,19 +431,6 @@ Window {
 
     }
 
-    ListView {
-        id: layerList
-        model: layerModel
-        delegate: layerDelegate
-
-        anchors {
-            top: layers.bottom
-            left: parent.left
-            right: parent.right
-            bottom: parent.bottom
-        }
-
-    }
 */
 
 }
