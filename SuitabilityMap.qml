@@ -15,6 +15,20 @@ Window {
     property int currentMap: -1
     property string thumbnail: ""
 
+    Connections {
+        target: applicationData
+        onMapChanged: {
+            console.log("Got map changed " + applicationData.map)
+            onMapChanged(applicationData.map)
+        }
+    }
+
+    function onMapChanged(map) {
+        console.log(map);
+
+        suitabilityMap = map;
+    }
+
     // functions
     function toQrc(s) {
         return s.replace("img://file/", "file:///");

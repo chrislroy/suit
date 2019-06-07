@@ -1,5 +1,8 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
+#include "backend.h"
+#include "fileio.h"
 
 int main(int argc, char *argv[])
 {
@@ -14,7 +17,15 @@ int main(int argc, char *argv[])
         if (!obj && url == objUrl)
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
+
+    Backend data;
+    engine.rootContext()->setContextProperty("applicationData", &data);
+
     engine.load(url);
+
+    FileIO map;
+    map.setSource("E:\\dev\\qml-dynamiclist\\data\\maps.json");
+    data.setMap(map.read());
 
     return app.exec();
 }
