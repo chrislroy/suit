@@ -15,6 +15,7 @@ Window {
     property string currentMap: ""
     property string currentMapIndex: ""
 
+    minimumHeight: 7 * 40 + layerModel.count * 80
     Connections {
         target: applicationData
         onMapChanged: {
@@ -278,10 +279,13 @@ Window {
         model: layerModel
         delegate: layerDelegate
         height: 200
+        Layout.preferredHeight: 40
+
         anchors {
             top: layersLabelBackground.bottom
             left: parent.left
             right: parent.right
+
             //bottom: controlBackground.top
         }
 
