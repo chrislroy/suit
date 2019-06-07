@@ -18,7 +18,7 @@ Window {
     Connections {
         target: applicationData
         onMapChanged: {
-            console.log("Got map changed " + applicationData.map)
+            //console.log("Got map changed " + applicationData.map)
             onMapChanged(applicationData.map)
         }
     }
@@ -42,6 +42,15 @@ Window {
 
     function isArray (value) {
         return value && typeof value === 'object' && value.constructor === Array;
+    }
+
+    function addLayer(layerObj) {
+        layerModel.append({
+            "object" : layerObj, //JSON.stringify(layerObj),
+            "name": layerObj["DisplayName"],
+            "weight": layerObj["Weight"],
+            "thumbnail": layerObj["Thumbnail"]
+        });
     }
 
     function updateUi() {
@@ -69,13 +78,13 @@ Window {
         // update the layer model
         if (currentMapIndex !== "") {
             mapThumbnail.source = toQrc(mapsJson[currentMapIndex]["SuitabilityMap"]["Thumbnail"]);
-            /*
-            var layers = theMap[currentMapIndex]["SuitabilityMap"]["SoftCostLayers"];
+
+            var layers = mapsJson[currentMapIndex]["SuitabilityMap"]["SoftCostLayers"];
             for (var i in layers) {
                 console.log("adding layer " + layers[i]["DisplayName"])
-                layerList.addLayer(layers[i]);
+                addLayer(layers[i]);
             }
-            */
+
             mapSelector.currentIndex = parseInt(currentMapIndex, 10);;
         }
     }
@@ -240,12 +249,13 @@ Window {
     Rectangle {
         id: layersLabelBackground
         color: "#2e2e2e"
-        anchors.top: costGradiantBackground.bottom
-        anchors.topMargin: 0
+
         height: 40
         anchors {
             left: parent.left
             right: parent.right
+            top: costGradiantBackground.bottom
+            topMargin: 0
         }
 
         RowLayout {
@@ -262,38 +272,39 @@ Window {
         }
     }
 
-    Rectangle {
-        color: "red"
-        anchors {
-            top: layersLabelBackground.bottom
-            left: parent.left
-            right: parent.right
-            bottom: controlBackground.top
-        }
-    }
-/*
-
 
     ListView {
         id: layerList
         model: layerModel
         delegate: layerDelegate
-
+        height: 200
         anchors {
             top: layersLabelBackground.bottom
             left: parent.left
             right: parent.right
-            bottom: controlBackground.top
+            //bottom: controlBackground.top
         }
 
     }
+/*
+    Rectangle {
+        id: filler
+        color: "red"
 
-
+        anchors {
+            topMargin: 0
+            top: layerList.bottom
+            right: parent.right
+            left: parent.left
+            //bottom: controlBackground.top
+        }
+    }
+*/
     Rectangle {
         id: controlBackground
-        width: 40
+        height: 40
         anchors {
-            top: layerList.bottom
+            top: filler.bottom
             right: parent.right
             left: parent.left
             bottom: parent.bottom
@@ -301,28 +312,28 @@ Window {
 
         RowLayout {
             id: controls
-            anchors.rightMargin: 0
-            anchors.leftMargin: 0
-            anchors.bottomMargin: 0
-            anchors.topMargin: 0
+            anchors.rightMargin: 5
+            anchors.leftMargin: 5
+            anchors.bottomMargin: 5
+            anchors.topMargin: 5
             anchors.fill:parent
 
-            Button {
+            RoundButton {
                 id: applyButton
-                text: "Apply"
-                Layout.bottomMargin: 0
-                Layout.topMargin: 0
+                text: "      Apply     "
                 Layout.leftMargin: 15
                 onClicked: console.log("Apply")
             }
 
-            Button {
+            RoundButton {
                 id: addlayerButton
-                width: 0
-                text: "Add Layer"
+                text: "   Add Layer   "
                 Layout.rightMargin: 15
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                onClicked: console.log("Add Layer")
+                onClicked: {
+                    console.log("Add Layer")
+                    dialog.open()
+                }
             }
 
         }
@@ -427,11 +438,19 @@ Window {
                     font.pixelSize: 12
                 }
             }
+
         }
 
     }
 
-*/
+    Dialog {
+        id: dialog
+        title: "Title"
+        standardButtons: Dialog.Ok | Dialog.Cancel
+
+        onAccepted: console.log("Ok clicked")
+        onRejected: console.log("Cancel clicked")
+    }
 
 }
 
