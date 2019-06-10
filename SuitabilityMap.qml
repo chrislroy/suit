@@ -5,7 +5,7 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls.Styles 1.4
 
 Window {
-    id: window
+    id: suitbilityWindow
     visible: true
     width: 640
     height: 480
@@ -23,6 +23,7 @@ Window {
             onMapChanged(applicationData.map)
         }
     }
+
 
     function onMapChanged(map) {
         console.log(map);
@@ -118,7 +119,7 @@ Window {
     }
 
     Rectangle {
-        id: activeMapsBackground
+        id: activeMapsBG
         color: "white"
         height: 40
         anchors {
@@ -128,7 +129,7 @@ Window {
         }
 
         RowLayout {
-            id: activateMaps
+            id: activateMapsLayout
             height: 40
 
             anchors.fill:parent
@@ -155,11 +156,11 @@ Window {
     }
 
     Rectangle {
-        id: selectorBackground
+        id: selectorBG
         color: "#2e2e2e"
         height: 80
         anchors {
-            top: activeMapsBackground.bottom
+            top: activeMapsBG.bottom
             left: parent.left
             right: parent.right
         }
@@ -206,12 +207,12 @@ Window {
         }
     }
     Rectangle {
-        id: costGradiantBackground
+        id: costGradiantBG
         color: "white"
         anchors.topMargin: 0
         height: 80
         anchors {
-            top: selectorBackground.bottom
+            top: selectorBG.bottom
             left: parent.left
             right: parent.right
         }
@@ -248,14 +249,14 @@ Window {
     }
 
     Rectangle {
-        id: layersLabelBackground
+        id: layersLabelBG
         color: "#2e2e2e"
 
         height: 40
         anchors {
             left: parent.left
             right: parent.right
-            top: costGradiantBackground.bottom
+            top: costGradiantBG.bottom
             topMargin: 0
         }
 
@@ -282,30 +283,16 @@ Window {
         Layout.preferredHeight: 40
 
         anchors {
-            top: layersLabelBackground.bottom
+            top: layersLabelBG.bottom
             left: parent.left
             right: parent.right
 
-            //bottom: controlBackground.top
         }
 
     }
-/*
-    Rectangle {
-        id: filler
-        color: "red"
 
-        anchors {
-            topMargin: 0
-            top: layerList.bottom
-            right: parent.right
-            left: parent.left
-            //bottom: controlBackground.top
-        }
-    }
-*/
     Rectangle {
-        id: controlBackground
+        id: controlBG
         height: 40
         anchors {
             top: filler.bottom
@@ -316,27 +303,28 @@ Window {
 
         RowLayout {
             id: controls
-            anchors.rightMargin: 5
-            anchors.leftMargin: 5
-            anchors.bottomMargin: 5
-            anchors.topMargin: 5
             anchors.fill:parent
 
-            RoundButton {
+            Button {
                 id: applyButton
                 text: "      Apply     "
                 Layout.leftMargin: 15
-                onClicked: console.log("Apply")
+                onClicked: {
+                    console.log("Apply");
+                    suitbilityWindow.close();
+                }
+
             }
 
-            RoundButton {
+            Button {
                 id: addlayerButton
                 text: "   Add Layer   "
                 Layout.rightMargin: 15
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+
                 onClicked: {
                     console.log("Add Layer")
-                    dialog.open()
+                    layerWindow.show()
                 }
             }
 
@@ -349,7 +337,7 @@ Window {
         id: layerDelegate
 
         Rectangle {
-            id: layer
+            id: layerBG
             height: 80
             property double sliderValue : 0
             anchors {
@@ -447,16 +435,316 @@ Window {
 
     }
 
-    Dialog {
-        id: dialog
-        title: "Title"
-        standardButtons: Dialog.Ok | Dialog.Cancel
 
-        onAccepted: console.log("Ok clicked")
-        onRejected: console.log("Cancel clicked")
+    Window {
+        id: layerWindow
+        width: 640
+        height: 480
+
+        property bool layerOK : false
+        title: "Layer Settings"
+
+        Rectangle {
+            id: layerNameBG
+            y: 0
+            height: 40
+            anchors.right: parent.right
+            anchors.rightMargin: 0
+            anchors.left: parent.left
+            anchors.leftMargin: 0
+            anchors.top: parent.top
+            anchors.topMargin: 0
+            Layout.fillWidth: true
+
+            RowLayout {
+                id: layerNameLayout
+                anchors.fill:parent
+                Text {
+                    text: "Layer Name"
+                    Layout.column: 0
+                    font.pointSize: 19
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                TextEdit {
+                    id: layerName
+                    font.pointSize: 19
+                    Layout.column: 1
+                    property string placeholderText: "New Layer"
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: layerName.placeholderText
+                        font.pointSize: 19
+                        color: "#aaa"
+                        visible: !layerName.text
+                    }
+                }
+            }
+
+
+        }
+
+
+
+        Rectangle {
+            id: featureSets
+            y: 0
+            height: 40
+            color: "#2b2b2b"
+            anchors.right: parent.right
+            anchors.rightMargin: 0
+            anchors.left: parent.left
+            anchors.leftMargin: 0
+            anchors.top: layerNameBG.bottom
+            anchors.topMargin: 0
+            Layout.fillWidth: true
+
+            Text {
+                id: addFeatureSetsLabel
+                color: "#7b7b7b"
+                text: qsTr("Add Feature Sets")
+                anchors.left: parent.left
+                anchors.leftMargin: 5
+                anchors.verticalCenter: parent.verticalCenter
+                font.pixelSize: 17
+            }
+        }
+
+
+
+
+        Rectangle {
+            id: featureSetSelectionBG
+            y: 0
+            height: 160
+            anchors.right: parent.right
+            anchors.rightMargin: 0
+            anchors.left: parent.left
+            anchors.leftMargin: 0
+            anchors.top: featureSets.bottom
+            anchors.topMargin: 0
+            Layout.fillWidth: true
+
+            ListView {
+                id: listView
+                anchors.fill: parent
+                delegate:
+                    Rectangle {
+                    width: 20
+                    height: 30
+                    color: index % 2 == 0 ? "#fbfbfb" : "#ebebeb"
+                }
+
+            }
+
+
+        }
+
+
+        Rectangle {
+            id: layerSettingBG
+            y: 0
+            height: 40
+            color: "#2b2b2b"
+            anchors.right: parent.right
+            anchors.rightMargin: 0
+            anchors.left: parent.left
+            anchors.leftMargin: 0
+            anchors.top: featureSetSelectionBG.bottom
+            anchors.topMargin: 0
+            Layout.fillWidth: true
+
+            Text {
+                color: "#7b7b7b"
+                text: "Layer Settings"
+                font.pointSize: 19
+            }
+        }
+
+
+
+        Rectangle {
+            id: gradientFunctionBG
+            y: 0
+            height: 40
+            color: "#fbfbfb"
+            anchors.right: parent.right
+            anchors.rightMargin: 0
+            anchors.left: parent.left
+            anchors.leftMargin: 0
+            anchors.top: layerSettingBG.bottom
+            anchors.topMargin: 0
+            Layout.fillWidth: true
+
+            RowLayout {
+                id: gradientFunctionLayout
+                anchors.fill:parent
+
+                Text {
+                    text: "Gradient Function"
+                    font.pointSize: 19
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+
+                }
+
+                ComboBox {
+                    id: gradientFunction
+                    x: 371
+                    y: 8
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    font.pointSize: 19
+                    model: ["Linear"]
+                }
+
+            }
+        }
+
+
+
+        Rectangle {
+            id: gradientWidthBG
+            y: 0
+            height: 40
+            color: "#ebebeb"
+            anchors.right: parent.right
+            anchors.rightMargin: 0
+            anchors.left: parent.left
+            anchors.leftMargin: 0
+            anchors.top: gradientFunctionBG.bottom
+            anchors.topMargin: 0
+            Layout.fillWidth: true
+
+            RowLayout {
+                id: gradientWidthLayout
+                anchors.fill: parent
+                Text {
+                    text: "Gradient Function"
+                    font.pointSize: 19
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                }
+
+                TextEdit {
+                    id: gradientWidth
+                    font.pointSize: 19
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    color: "#b5b5b5"
+                    property string placeholderText: "50 m"
+                    Text {
+                        text: gradientWidth.placeholderText
+                        font.pointSize: 19
+                        color: "#aaa"
+                        visible: !gradientWidth.text
+                    }
+                }
+            }
+        }
+
+
+
+
+        Rectangle {
+            id: offsetAroundFeatureBG
+            height: 40
+            color: "#fbfbfb"
+            anchors.right: parent.right
+            anchors.rightMargin: 0
+            anchors.left: parent.left
+            anchors.leftMargin: 0
+            anchors.top: gradientWidthBG.bottom
+            anchors.topMargin: 0
+            Layout.fillWidth: true
+
+            RowLayout {
+                id: offsetAroundFeatureLayout
+                anchors.fill: parent
+
+                Text {
+                    text: "Offset Around Feature"
+                    font.pointSize: 19
+
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                }
+
+                TextEdit {
+                    id: offset
+                    property string placeholderText: "0 m"
+                    color: "#b5b5b5"
+                    font.pointSize: 19
+
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+
+                    Text {
+                        text: offset.placeholderText
+                        font.pointSize: 19
+                        color: "#aaa"
+                        visible: !offset.text
+                    }
+                }
+
+
+            }
+        }
+
+
+        Rectangle {
+            id: editLayerControlsBG
+            height: 40
+            anchors {
+                top: filler.bottom
+                right: parent.right
+                left: parent.left
+                bottom: parent.bottom
+            }
+
+            RowLayout {
+                id: editLayerControlsLayout
+                anchors.rightMargin: 5
+                anchors.leftMargin: 5
+                anchors.bottomMargin: 5
+                anchors.topMargin: 5
+                anchors.fill:parent
+
+
+                Button {
+                    id: acceptButton
+                    text: "      OK     "
+                    Layout.leftMargin: 15
+                    onClicked: {
+                        console.log("Accept")
+                        layerWindow.layerOK = true;
+                        layerWindow.close()
+                    }
+                }
+
+                Button {
+                    id: cancelButton
+                    text: "   Cancel   "
+                    Layout.rightMargin: 15
+                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                    onClicked: {
+                        console.log("Cancel")
+                        layerWindow.layerOK = false;
+                        layerWindow.close()
+                    }
+                }
+
+            }
+        }
+
+
     }
 
+
 }
+
+
 
 
 
