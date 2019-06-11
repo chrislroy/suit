@@ -5,21 +5,21 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls.Styles 1.4
 
 Item {
-    id: suitabilityWindow
+    id: suitbilityWindow
     visible: true
     width: 640
     height: 480
-//    title: qsTr("Hello World")
+    //title: qsTr("Suitability Map")
 
     property string maps;
     property string currentMap: ""
     property string currentMapIndex: ""
 
-//    minimumHeight: 7 * 40 + layerModel.count * 80
+    //minimumHeight: 7 * 40 + layerModel.count * 80
     Connections {
         target: applicationData
         onMapChanged: {
-            //console.log("Got map changed " + applicationData.map)
+            console.log("Got map changed " + applicationData.map)
             onMapChanged(applicationData.map)
         }
     }
@@ -68,17 +68,25 @@ Item {
 
         var currentIndex = ""
         for(var j in mapsJson) {
-            if (mapsJson[j]["SuitabilityMap"]["Enabled"] && currentIndex === "") {
+            console.log("J:" + j)
+
+            if (mapsJson[j]["SuitabilityMap"]["Enabled"] && currentIndex === "")
                 currentIndex = j;
-            }
-            mapModel.append( { mapName : mapsJson[j]["SuitabilityMap"]["Name"], mapFile: mapsJson[j]["File"] })
+            mapModel.append( { mapName : mapsJson[j]["SuitabilityMap"]["Name"] })
         }
         mapModel.append( { mapName : "Create new map..." })
 
         currentMapIndex = currentIndex;
+        //currentMap = mapsJson[currentMapIndex]["File"];
 
         // update the layer model
         if (currentMapIndex !== "") {
+            console.log("Got a valid map");
+            currentMap = mapsJson[currentMapIndex]["File"];
+
+            console.log("currentMapIndex: " + currentMapIndex );
+            console.log("currentMap: " + currentMap );
+
             mapThumbnail.source = toQrc(mapsJson[currentMapIndex]["SuitabilityMap"]["Thumbnail"]);
 
             var layers = mapsJson[currentMapIndex]["SuitabilityMap"]["SoftCostLayers"];
@@ -96,17 +104,21 @@ Item {
 
         console.log("update all maps " + checked)
 
-        mapSelector.enabled = checked
         if (!checked) {
             layerModel.clear();
-            applicationData.onSuitabilityMapChange("");
+            applicationData.onSuitabilityMapActive("");
             return;
         }
 
-        mapSelector.currentIndex = parseInt(currentMapIndex, 10);;
-        var mapsJson = JSON.parse(maps);
+        applicationData.onSuitabilityMapActive(currentMap);
+    }
 
-        applicationData.onSuitabilityMapChange(mapsJson[currentMapIndex]["File"]);
+    function fontSize() {
+        return 9;
+    }
+
+    function getTileHeight() {
+        return 50;
     }
 
     // combo box model
@@ -121,7 +133,7 @@ Item {
     Rectangle {
         id: activeMapsBG
         color: "white"
-        height: 40
+        height: getTileHeight()
         anchors {
             top: parent.top
             left: parent.left
@@ -130,7 +142,7 @@ Item {
 
         RowLayout {
             id: activateMapsLayout
-            height: 40
+            height: getTileHeight()
 
             anchors.fill:parent
 
@@ -141,7 +153,7 @@ Item {
                 text: "Activate Maps"
                 Layout.leftMargin: 15
                 font.bold: true
-                font.pointSize: 19
+                font.pointSize: fontSize()
                 font.wordSpacing: -0.1
             }
             Switch {
@@ -158,7 +170,7 @@ Item {
     Rectangle {
         id: selectorBG
         color: "#2e2e2e"
-        height: 80
+        height: getTileHeight() * 2
         anchors {
             top: activeMapsBG.bottom
             left: parent.left
@@ -190,10 +202,13 @@ Item {
                 x: -240
                 y: 20
                 model: mapModel
+                textRole: "mapName"
                 Layout.leftMargin: 50
                 Layout.fillWidth: true
-                textRole: "mapName"
-                onActivated: console.log("Combo activated " + mapModel.get(index).mapFile)
+                onActivated: {
+                    console.log("Combo activated " + mapModel.get(index).mapFile)
+                    applicationData.onSuitabilityMapActive(mapModel.get(index).mapFile);
+                }
             }
 
             Button {
@@ -212,7 +227,7 @@ Item {
         id: costGradiantBG
         color: "white"
         anchors.topMargin: 0
-        height: 80
+        height: getTileHeight() * 2
         anchors {
             top: selectorBG.bottom
             left: parent.left
@@ -230,7 +245,7 @@ Item {
                 Layout.alignment: Qt.AlignLeft | Qt.AlignTop
                 Layout.leftMargin: 15
                 font.bold: true
-                font.pointSize: 19
+                font.pointSize: fontSize()
             }
 
             Rectangle {
@@ -254,7 +269,7 @@ Item {
         id: layersLabelBG
         color: "#2e2e2e"
 
-        height: 40
+        height: getTileHeight()
         anchors {
             left: parent.left
             right: parent.right
@@ -270,7 +285,7 @@ Item {
                 text: "Layers"
                 Layout.leftMargin: 15
                 font.bold: true
-                font.pointSize: 19
+                font.pointSize: fontSize()
                 color: "#797979"
             }
         }
@@ -282,7 +297,7 @@ Item {
         model: layerModel
         delegate: layerDelegate
         height: 200
-        Layout.preferredHeight: 40
+        Layout.preferredHeight: getTileHeight()
 
         anchors {
             top: layersLabelBG.bottom
@@ -295,7 +310,7 @@ Item {
 
     Rectangle {
         id: controlBG
-        height: 40
+        height: getTileHeight()
         anchors {
             top: layerList.bottom
             right: parent.right
@@ -340,7 +355,7 @@ Item {
 
         Rectangle {
             id: layerBG
-            height: 80
+            height: getTileHeight() * 2
             property double sliderValue : 0
             anchors {
                 left: parent.left
@@ -449,7 +464,7 @@ Item {
         Rectangle {
             id: layerNameBG
             y: 0
-            height: 40
+            height: getTileHeight()
             anchors.right: parent.right
             anchors.rightMargin: 0
             anchors.left: parent.left
@@ -464,20 +479,20 @@ Item {
                 Text {
                     text: "Layer Name"
                     Layout.column: 0
-                    font.pointSize: 19
+                    font.pointSize: fontSize()
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
                 TextEdit {
                     id: layerName
-                    font.pointSize: 19
+                    font.pointSize: fontSize()
                     Layout.column: 1
                     property string placeholderText: "New Layer"
 
                     Text {
                         Layout.fillWidth: true
                         text: layerName.placeholderText
-                        font.pointSize: 19
+                        font.pointSize: fontSize()
                         color: "#aaa"
                         visible: !layerName.text
                     }
@@ -492,7 +507,7 @@ Item {
         Rectangle {
             id: featureSets
             y: 0
-            height: 40
+            height: getTileHeight()
             color: "#2b2b2b"
             anchors.right: parent.right
             anchors.rightMargin: 0
@@ -519,7 +534,7 @@ Item {
         Rectangle {
             id: featureSetSelectionBG
             y: 0
-            height: 160
+            height: getTileHeight() * 4
             anchors.right: parent.right
             anchors.rightMargin: 0
             anchors.left: parent.left
@@ -547,7 +562,7 @@ Item {
         Rectangle {
             id: layerSettingBG
             y: 0
-            height: 40
+            height: getTileHeight()
             color: "#2b2b2b"
             anchors.right: parent.right
             anchors.rightMargin: 0
@@ -560,7 +575,7 @@ Item {
             Text {
                 color: "#7b7b7b"
                 text: "Layer Settings"
-                font.pointSize: 19
+                font.pointSize: fontSize()
             }
         }
 
@@ -569,7 +584,7 @@ Item {
         Rectangle {
             id: gradientFunctionBG
             y: 0
-            height: 40
+            height: getTileHeight()
             color: "#fbfbfb"
             anchors.right: parent.right
             anchors.rightMargin: 0
@@ -585,7 +600,7 @@ Item {
 
                 Text {
                     text: "Gradient Function"
-                    font.pointSize: 19
+                    font.pointSize: fontSize()
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
 
@@ -597,7 +612,7 @@ Item {
                     y: 8
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
-                    font.pointSize: 19
+                    font.pointSize: fontSize()
                     model: ["Linear"]
                 }
 
@@ -609,7 +624,7 @@ Item {
         Rectangle {
             id: gradientWidthBG
             y: 0
-            height: 40
+            height: getTileHeight()
             color: "#ebebeb"
             anchors.right: parent.right
             anchors.rightMargin: 0
@@ -624,21 +639,21 @@ Item {
                 anchors.fill: parent
                 Text {
                     text: "Gradient Function"
-                    font.pointSize: 19
+                    font.pointSize: fontSize()
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
                 }
 
                 TextEdit {
                     id: gradientWidth
-                    font.pointSize: 19
+                    font.pointSize: fontSize()
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
                     color: "#b5b5b5"
                     property string placeholderText: "50 m"
                     Text {
                         text: gradientWidth.placeholderText
-                        font.pointSize: 19
+                        font.pointSize: fontSize()
                         color: "#aaa"
                         visible: !gradientWidth.text
                     }
@@ -651,7 +666,7 @@ Item {
 
         Rectangle {
             id: offsetAroundFeatureBG
-            height: 40
+            height: getTileHeight()
             color: "#fbfbfb"
             anchors.right: parent.right
             anchors.rightMargin: 0
@@ -667,7 +682,7 @@ Item {
 
                 Text {
                     text: "Offset Around Feature"
-                    font.pointSize: 19
+                    font.pointSize: fontSize()
 
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
@@ -677,14 +692,14 @@ Item {
                     id: offset
                     property string placeholderText: "0 m"
                     color: "#b5b5b5"
-                    font.pointSize: 19
+                    font.pointSize: fontSize()
 
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
 
                     Text {
                         text: offset.placeholderText
-                        font.pointSize: 19
+                        font.pointSize: fontSize()
                         color: "#aaa"
                         visible: !offset.text
                     }
@@ -694,9 +709,10 @@ Item {
             }
         }
 
+
         Rectangle {
             id: editLayerControlsBG
-            height: 40
+            height: getTileHeight()
             anchors {
                 top: offsetAroundFeatureBG.bottom
                 right: parent.right
