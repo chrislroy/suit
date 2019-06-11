@@ -71,7 +71,7 @@ Item {
             if (mapsJson[j]["SuitabilityMap"]["Enabled"] && currentIndex === "") {
                 currentIndex = j;
             }
-            mapModel.append( { mapName : mapsJson[j]["SuitabilityMap"]["Name"] })
+            mapModel.append( { mapName : mapsJson[j]["SuitabilityMap"]["Name"], mapFile: mapsJson[j]["File"] })
         }
         mapModel.append( { mapName : "Create new map..." })
 
@@ -192,6 +192,8 @@ Item {
                 model: mapModel
                 Layout.leftMargin: 50
                 Layout.fillWidth: true
+                textRole: "mapName"
+                onActivated: console.log("Combo activated " + mapModel.get(index).mapFile)
             }
 
             Button {
