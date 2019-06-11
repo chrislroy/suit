@@ -4,18 +4,18 @@ import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.12
 import QtQuick.Controls.Styles 1.4
 
-Window {
-    id: suitbilityWindow
+Item {
+    id: suitabilityWindow
     visible: true
     width: 640
     height: 480
-    title: qsTr("Hello World")
+//    title: qsTr("Hello World")
 
     property string maps;
     property string currentMap: ""
     property string currentMapIndex: ""
 
-    minimumHeight: 7 * 40 + layerModel.count * 80
+//    minimumHeight: 7 * 40 + layerModel.count * 80
     Connections {
         target: applicationData
         onMapChanged: {
@@ -295,7 +295,7 @@ Window {
         id: controlBG
         height: 40
         anchors {
-            top: filler.bottom
+            top: layerList.bottom
             right: parent.right
             left: parent.left
             bottom: parent.bottom
@@ -692,12 +692,11 @@ Window {
             }
         }
 
-
         Rectangle {
             id: editLayerControlsBG
             height: 40
             anchors {
-                top: filler.bottom
+                top: offsetAroundFeatureBG.bottom
                 right: parent.right
                 left: parent.left
                 bottom: parent.bottom
