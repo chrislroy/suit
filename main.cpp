@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     Backend data;
     w->engine()->rootContext()->setContextProperty("applicationData", &data);
 
-    w->setSource(QUrl("qrc:/SuitabilityMap.qml"));
+    w->setSource(QUrl("qrc:/layer.qml"));
     w->show();
 
 

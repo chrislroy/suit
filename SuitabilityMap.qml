@@ -46,6 +46,8 @@ Item {
         return value && typeof value === 'object' && value.constructor === Array;
     }
 
+
+
     function addLayer(layerObj) {
         layerModel.append({
             "object" : layerObj, //JSON.stringify(layerObj),
@@ -81,6 +83,7 @@ Item {
 
         // update the layer model
         if (currentMapIndex !== "") {
+            activeMapsSwitch.checked = true;
             console.log("Got a valid map");
             currentMap = mapsJson[currentMapIndex]["File"];
 
@@ -96,6 +99,9 @@ Item {
             }
 
             mapSelector.currentIndex = parseInt(currentMapIndex, 10);;
+        }
+        else {
+            activeMapsSwitch.checked = false;
         }
     }
 
@@ -158,6 +164,7 @@ Item {
             }
             Switch {
                 id: activeMapsSwitch
+                icon.source: "red"
                 Layout.rightMargin: 15
                 Layout.leftMargin: 1
                 Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
@@ -169,8 +176,19 @@ Item {
 
     Rectangle {
         id: selectorBG
-        color: "#2e2e2e"
         height: getTileHeight() * 2
+        color: "#cf6f6f"
+        gradient: Gradient {
+            GradientStop {
+                position: 0
+                color: "#cf6f6f"
+            }
+
+            GradientStop {
+                position: 1
+                color: "#000000"
+            }
+        }
         anchors {
             top: activeMapsBG.bottom
             left: parent.left
@@ -195,6 +213,8 @@ Item {
                 Layout.fillWidth: false
                 Layout.leftMargin: 15
                 fillMode: Image.PreserveAspectFit
+
+                onStatusChanged: if (image.status == Image.Ready) console.log('Loaded')
             }
 
             ComboBox {
@@ -233,14 +253,14 @@ Item {
             left: parent.left
             right: parent.right
         }
-        RowLayout {
+        ColumnLayout {
             id: costGradient
             anchors.fill:parent
 
             Text {
                 id: costGradientLabel
-                color: "#797979"
                 text: "Cost Gradient"
+                height: 50
                 Layout.topMargin: 5
                 Layout.alignment: Qt.AlignLeft | Qt.AlignTop
                 Layout.leftMargin: 15
@@ -250,17 +270,56 @@ Item {
 
             Rectangle {
                 id: gradientRectangle
-                Layout.bottomMargin: 5
-                Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
+                height: 50
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
                 Layout.fillWidth: true
-                gradient : Gradient {
-                    orientation: Gradient.Horizontal
-                    GradientStop { position: 0.0; color: "#640000ff" }
-                    GradientStop { position: 0.25; color: "#8000ff00" }
-                    GradientStop { position: 0.5; color: "#a5ffff00" }
-                    GradientStop { position: 0.75; color: "#e2ff5a00" }
-                    GradientStop { position: 1.0; color: "#f0ff0000" }
+                //Layout.fillHeight: true
+                color: "#ebebeb"
+
+                Rectangle {
+                    id: junk
+                    // color: "red"
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    //Layout.leftMargin: 15
+                    //Layout.topMargin: 5
+                    x: 15
+                    y: 5
+                    height: parent.height - 10
+                    width: parent.width - 30
+
+                    RowLayout {
+                        anchors.fill:parent
+
+                        Text {
+                            text: "High"
+                            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                            Layout.leftMargin: 10
+                            font.pointSize: fontSize()
+                        }
+
+                        Text {
+                            text: "Low"
+                            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                            Layout.rightMargin: 10
+
+                            font.pointSize: fontSize()
+                        }
+                    }
+
+
+
+                    gradient: Gradient {
+                        orientation: Gradient.Horizontal
+
+                        GradientStop { position: 0.0; color: "#640000ff" }
+                        GradientStop { position: 0.25; color: "#8000ff00" }
+                        GradientStop { position: 0.5; color: "#a5ffff00" }
+                        GradientStop { position: 0.75; color: "#e2ff5a00" }
+                        GradientStop { position: 1.0; color: "#f0ff0000" }
+
+                    }
                 }
+
             }
         }
     }
@@ -349,6 +408,13 @@ Item {
     }
 
 
+    Component {
+        id: popupDelegate
+
+        Rectangle {
+            color: "red"
+        }
+    }
 
     Component {
         id: layerDelegate
@@ -383,6 +449,13 @@ Item {
                     anchors.fill: parent
                     source: toQrc(thumbnail)
                     fillMode: Image.PreserveAspectFit
+
+                    onStatusChanged: {
+                        if (image.status == Image.Error) {
+                            //console.log('****** Error loading map thumbnail')
+                            image.source = "../../images/missing_thumbnail.png"
+                        }
+                    }
                 }
 
             }
@@ -411,14 +484,35 @@ Item {
                     from: 0
                     value: parseFloat(weight) * 100
                     to: 100
-                    onValueChanged: {
+
+                    onPressedChanged: {
+                        if(pressed)
+                            return;
                         sliderValue = value / 100;
-                        //var t = JSON.parse(object);
-                        object["Weight"] = sliderValue;
-                        var s = JSON.stringify(object)
-                        console.log(s);
-                        applicationData.onLayerChange(s)
-                        console.log(sliderValue)
+                        //console.log(sliderValue);
+                        var layer = JSON.parse(layerModel.get(index).json);
+                        layer["Weight"] = sliderValue;
+                        //console.log(currentMapIndex);
+                        var mapsJson = JSON.parse(maps);
+                        var currentMap = mapsJson[currentMapIndex];
+                        //console.log(JSON.stringify(currentMap["SuitabilityMap"]["SoftCostLayers"][index]));
+                        //console.log(JSON.stringify(layer));
+                        currentMap["SuitabilityMap"]["SoftCostLayers"][index] = layer;
+                        var test = {
+                            "File": fixFilePath(currentMap["File"]),
+                            "ColorTheme":currentMap["SuitabilityMap"]["ColorTheme"],
+                            "Enabled":currentMap["SuitabilityMap"]["Enabled"],
+                            "Thumbnail":currentMap["SuitabilityMap"]["Thumbnail"],
+                            "Version":currentMap["SuitabilityMap"]["Version"],
+                            "Name":currentMap["SuitabilityMap"]["Name"],
+                            "SoftCostLayers":currentMap["SuitabilityMap"]["SoftCostLayers"]
+                        }
+                        //console.log("**********************************************")
+                        //console.log(JSON.stringify(test));
+                        var updatedMap = [];
+                        updatedMap.push(test);
+                        //console.log(JSON.stringify(updatedMap));
+                        applicationData.onSuitabilityMapChange(JSON.stringify(test));
                     }
 
                 }
@@ -827,7 +921,31 @@ Item {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*##^## Designer {
-    D{i:24;anchors_height:200;anchors_width:200}
+    D{i:21;anchors_height:200;anchors_width:200}D{i:23;anchors_height:200;anchors_width:200}
 }
  ##^##*/

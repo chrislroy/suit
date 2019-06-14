@@ -3,5 +3,7 @@
         <file>SuitabilityMap.qml</file>
         <file>main.qml</file>
         <file>layerDialog.qml</file>
+        <file>layer.qml</file>
+        <file>missing_thumbnail.png</file>
     </qresource>
 </RCC>
